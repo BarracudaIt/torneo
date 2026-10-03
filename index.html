@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo Giochini 🎲</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --card-bg: #313244;
+            --text-color: #cdd6f4;
+            --accent-purple: #cba6f7;
+            --accent-green: #a6e3a1;
+            --accent-red: #f38ba8;
+            --accent-yellow: #f9e2af;
+            --accent-blue: #89b4fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-purple);
+            margin: 0 0 5px 0;
+            font-size: 2rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--accent-purple);
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Sezione Audio Player */
+        .audio-section {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 400px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        /* Sezione Dado */
+        .dice-section {
+            text-align: center;
+        }
+
+        .dice-icon {
+            font-size: 4rem;
+            margin: 5px 0;
+            user-select: none;
+        }
+
+        .result-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-green);
+            min-height: 1.5em;
+        }
+
+        .url-text {
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            word-break: break-all;
+            margin-top: 5px;
+        }
+
+        /* Pulsanti Controllo */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-roll { background-color: var(--accent-blue); color: #11111b; }
+        .btn-next { background-color: #45475a; color: var(--text-color); }
+        .btn-reset { background-color: var(--accent-yellow); color: #11111b; }
+
+        /* Score Tracker Banner */
+        .score-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-val {
+            color: var(--accent-yellow);
+            font-size: 1.4rem;
+        }
+
+        /* Tabella Giochi */
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #45475a;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-color);
+            border-radius: 6px 6px 0 0;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: #11111b;
+        }
+
+        .games-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .games-list li {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .games-list.unplayed li { color: var(--accent-green); }
+        .games-list.played li { color: #a6adc8; }
+
+        .status-btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-win {
+            background-color: var(--accent-green);
+            color: #11111b;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-lose {
+            background-color: var(--accent-red);
+            color: #11111b;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .badge-win {
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .badge-lose {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        /* Fine Torneo Banner */
+        .end-tournament-card {
+            background: linear-gradient(135deg, #45475a, #313244);
+            border: 2px solid var(--accent-yellow);
+            text-align: center;
+            display: none;
+        }
+
+        .end-tournament-card h2 {
+            color: var(--accent-yellow);
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ TORNEO GIOCHINI ✨</h1>
+    <h2>🎲 da SUPER Gay Razzisti 🎲</h2>
+
+    <!-- Sezione Jingle Audio -->
+    <div class="card audio-section">
+        <h3 class="section-title" style="margin-bottom: 5px; color: var(--accent-purple);">🎵 Jingle del Torneo</h3>
+        <audio id="jingleAudio" controls>
+            <source src="jingle.mp3" type="audio/mpeg">
+            Il tuo browser non supporta l'elemento audio.
+        </audio>
+    </div>
+
+    <!-- Punteggio Totale -->
+    <div class="score-banner">
+        <span>🏆 Punteggio Torneo:</span>
+        <span class="score-val" id="totalScore">0 / 0</span>
+    </div>
+
+    <!-- Sezione Dado -->
+    <div class="card dice-section">
+        <div class="dice-icon" id="diceIcon">🎲</div>
+        <div class="result-text" id="resultText">Premi 'Lancia Dado' per iniziare il torneo</div>
+        <div class="url-text" id="urlText"></div>
+    </div>
+
+    <!-- Pulsanti Controllo -->
+    <div class="btn-group">
+        <button class="btn-roll" id="rollBtn" onclick="startRoll()">🎲 Lancia Dado</button>
+        <button class="btn-next" id="nextBtn" onclick="startRoll()">⏭ Gioco Successivo</button>
+        <button class="btn-reset" onclick="resetGames()">🔄 Reset Torneo</button>
+    </div>
+
+    <!-- Card Fine Torneo -->
+    <div class="card end-tournament-card" id="endCard">
+        <h2>🎉 TORNEO COMPLETATO! 🎉</h2>
+        <p id="endSummary" style="font-size: 1.2rem; font-weight: bold; margin-top: 10px;"></p>
+    </div>
+
+    <!-- Tabella Giochi -->
+    <div class="card">
+        <div class="tab-buttons">
+            <button class="tab-btn active" id="tabUnplayedBtn" onclick="switchTab('unplayed')">Non Fatti (0)</button>
+            <button class="tab-btn" id="tabPlayedBtn" onclick="switchTab('played')">Fatti (0)</button>
+        </div>
+        <ul class="games-list unplayed" id="unplayedList"></ul>
+        <ul class="games-list played" id="playedList" style="display: none;"></ul>
+    </div>
+</div>
+
+<script>
+    // Lista giochi di base
+    const GIOCHI_BASE = [
+        { nome: "Geoguesser", url: "https://www.geoguessr.com/it/daily-challenges" },
+        { nome: "Fooduesser", url: "https://www.foodguessr.com/" },
+        { nome: "timeguesser", url: "https://timeguessr.com/" },
+        { nome: "Gamedle", url: "https://www.gamedle.wtf/?lang=en" },
+        { nome: "Songless", url: "https://lessgames.com/songless" },
+        { nome: "Flage", url: "https://flagle-game.com/daily" },
+        { nome: "Parole", url: "https://pietroppeter.github.io/wordle-it/" },
+        { nome: "4 Parole", url: "https://quordlegame.org/it/"},
+        { nome: "Gioco ASTA", url: "https://neal.fun/auction-game/"},
+        { nome: "Frase fortunata", url: "https://www.ed0.it/quiz/it/lafrasefortunata/"},
+        { nome: "Indovina il FILM", url: "https://moviedle.net/"},
+        { nome: "Quanto è grosso??", url: "https://magnitudle.com/size-it-up"},
+        { nome: "Indovina il gioco", url: "https://guessthe.game/"},
+        { nome: "colore personaggi", url: "https://dialed.gg/color2"},
+        { nome: "indovina l'album", url: "https://www.ed0.it/quiz/guessthealbum/"},
+        { nome: "indovina l'artista", url: "https://spotle.io/"},
+        { nome: "indovina l'ordine degli oggetti", url: "https://www.lilsnack.co/game/stack"},
+        { nome: "ghigliottina", url: "https://www.ed0.it/quiz/parolachiave/"},
+    ];
+
+    let giochiNonFatti = [...GIOCHI_BASE];
+    let giochiFatti = [];
+    let isRolling = false;
+    let tournamentStarted = false;
+
+    // Inizializzazione Interfaccia
+    function init() {
+        updateGamesList();
+        updateScoreDisplay();
+    }
+
+    // Gestione Riproduzione Audio (Solo all'inizio del torneo)
+    function checkAudioOnStart() {
+        if (!tournamentStarted) {
+            tournamentStarted = true;
+            const audio = document.getElementById('jingleAudio');
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Riproduzione audio bloccata dal browser:", e));
+            }
+        }
+    }
+
+    // Aggiorna Punteggio Globale
+    function updateScoreDisplay() {
+        const puntiVinti = giochiFatti.filter(g => g.esito === 'vinto').length;
+        const totaleFatti = giochiFatti.length;
+        document.getElementById('totalScore').textContent = `${puntiVinti} / ${totaleFatti}`;
+    }
+
+    // Imposta il risultato del gioco fatto
+    function setGameResult(index, result) {
+        giochiFatti[index].esito = result;
+        updateGamesList();
+        updateScoreDisplay();
+        checkTournamentEnd();
+    }
+
+    // Controlla se il torneo è finito
+    function checkTournamentEnd() {
+        if (giochiNonFatti.length === 0) {
+            const puntiVinti = giochiFatti.filter(g => g.esito === 'vinto').length;
+            const totaleGiochi = GIOCHI_BASE.length;
+            const endCard = document.getElementById('endCard');
+            const endSummary = document.getElementById('endSummary');
+
+            endSummary.textContent = `Hai completato tutti i giochi! Punteggio Finale: ${puntiVinti} su ${totaleGiochi} punti vinti.`;
+            endCard.style.display = 'block';
+        }
+    }
+
+    // Animazione Dado e Estrazione
+    function startRoll() {
+        if (isRolling) return;
+
+        if (giochiNonFatti.length === 0) {
+            document.getElementById('resultText').textContent = "Tutti i giochi sono stati fatti! Torneo completato.";
+            document.getElementById('resultText').style.color = "var(--accent-yellow)";
+            checkTournamentEnd();
+            return;
+        }
+
+        // Avvia l'audio SOLO la prima volta che parte il torneo
+        checkAudioOnStart();
+
+        isRolling = true;
+        document.getElementById('rollBtn').disabled = true;
+        document.getElementById('nextBtn').disabled = true;
+
+        const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+        let steps = 0;
+        const maxSteps = 12;
+
+        function animate() {
+            const randomFace = diceFaces[Math.floor(Math.random() * diceFaces.length)];
+            const tempGame = GIOCHI_BASE[Math.floor(Math.random() * GIOCHI_BASE.length)];
+
+            document.getElementById('diceIcon').textContent = randomFace;
+            document.getElementById('resultText').style.color = "var(--accent-green)";
+            document.getElementById('resultText').textContent = `Estrazione... ${tempGame.nome}`;
+
+            steps++;
+            if (steps < maxSteps) {
+                setTimeout(animate, 70 + (steps * 12));
+            } else {
+                finalizeRoll();
+            }
+        }
+
+        animate();
+    }
+
+    function finalizeRoll() {
+        const selectedIndex = Math.floor(Math.random() * giochiNonFatti.length);
+        const selectedGame = giochiNonFatti[selectedIndex];
+
+        // Rimuovi dai non fatti e metti nei fatti (senza esito ancora)
+        giochiNonFatti.splice(selectedIndex, 1);
+        giochiFatti.push({ ...selectedGame, esito: null });
+
+        document.getElementById('diceIcon').textContent = "🎲";
+        document.getElementById('resultText').textContent = `Estratto: ${selectedGame.nome}`;
+        document.getElementById('urlText').textContent = selectedGame.url;
+
+        updateGamesList();
+        updateScoreDisplay();
+
+        // Apri link in nuova scheda
+        window.open(selectedGame.url, '_blank');
+
+        isRolling = false;
+        document.getElementById('rollBtn').disabled = false;
+        document.getElementById('nextBtn').disabled = false;
+
+        checkTournamentEnd();
+    }
+
+    // Gestione Liste
+    function updateGamesList() {
+        const unplayedUl = document.getElementById('unplayedList');
+        const playedUl = document.getElementById('playedList');
+
+        // Render lista non fatti
+        unplayedUl.innerHTML = giochiNonFatti.map(g => `<li><span>• ${g.nome}</span></li>`).join('');
+
+        // Render lista fatti con pulsanti / esito
+        playedUl.innerHTML = giochiFatti.map((g, index) => {
+            let actionContent = '';
+            if (g.esito === 'vinto') {
+                actionContent = `<span class="badge-win">✓ Vinto (+1)</span>`;
+            } else if (g.esito === 'perso') {
+                actionContent = `<span class="badge-lose">✗ Perso (0)</span>`;
+            } else {
+                actionContent = `
+                    <div class="status-btn-group">
+                        <button class="btn-win" onclick="setGameResult(${index}, 'vinto')">Vinto</button>
+                        <button class="btn-lose" onclick="setGameResult(${index}, 'perso')">Perso</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <li>
+                    <span>${g.nome}</span>
+                    ${actionContent}
+                </li>
+            `;
+        }).join('');
+
+        document.getElementById('tabUnplayedBtn').textContent = `Non Fatti (${giochiNonFatti.length})`;
+        document.getElementById('tabPlayedBtn').textContent = `Fatti (${giochiFatti.length})`;
+    }
+
+    function resetGames() {
+        giochiNonFatti = [...GIOCHI_BASE];
+        giochiFatti = [];
+        tournamentStarted = false;
+        document.getElementById('endCard').style.display = 'none';
+        
+        // Stoppa e resetta audio se in esecuzione
+        const audio = document.getElementById('jingleAudio');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+
+        updateGamesList();
+        updateScoreDisplay();
+
+        document.getElementById('resultText').style.color = "var(--accent-green)";
+        document.getElementById('resultText').textContent = "Torneo resettato! Premi 'Lancia Dado' per iniziare.";
+        document.getElementById('urlText').textContent = "";
+    }
+
+    function switchTab(tab) {
+        const unplayedUl = document.getElementById('unplayedList');
+        const playedUl = document.getElementById('playedList');
+        const unplayedBtn = document.getElementById('tabUnplayedBtn');
+        const playedBtn = document.getElementById('tabPlayedBtn');
+
+        if (tab === 'unplayed') {
+            unplayedUl.style.display = 'block';
+            playedUl.style.display = 'none';
+            unplayedBtn.classList.add('active');
+            playedBtn.classList.remove('active');
+        } else {
+            unplayedUl.style.display = 'none';
+            playedUl.style.display = 'block';
+            playedBtn.classList.add('active');
+            unplayedBtn.classList.remove('active');
+        }
+    }
+
+    // Avvio
+    init();
+</script>
+
+</body>
+</html>

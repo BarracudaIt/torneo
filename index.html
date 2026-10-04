@@ -234,14 +234,28 @@
     <h1>✨ TORNEO GIOCHINI ✨</h1>
     <h2>🎲 da SUPER Gay Razzisti 🎲</h2>
 
+   
     <!-- Sezione Jingle Audio -->
     <div class="card audio-section">
         <h3 class="section-title" style="margin-bottom: 5px; color: var(--accent-purple);">🎵 Jingle del Torneo</h3>
         <audio id="jingleAudio" controls>
-            <source src="jingle.mp3" type="audio/mpeg">
+            <source id="jingleSource" src="" type="audio/mpeg">
             Il tuo browser non supporta l'elemento audio.
         </audio>
     </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const jingles = ['jingle.mp3', 'jingle2.mp3'];
+        const randomJingle = jingles[Math.floor(Math.random() * jingles.length)];
+        
+        const audioSource = document.getElementById('jingleSource');
+        const audioElement = document.getElementById('jingleAudio');
+        
+        audioSource.src = randomJingle;
+        audioElement.load(); // Ricarica il player con la nuova sorgente
+      });
+    </script>
 
     <!-- Punteggio Totale -->
     <div class="score-banner">
